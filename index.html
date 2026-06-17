@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Claim Verifier — Jasper Reed</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f17;
+      --surface: #111827;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #7c3aed;
+      --accent-hover: #6d28d9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .wrap { max-width: 800px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: 36px; margin-bottom: 8px; }
+    h2 { font-size: 24px; margin: 40px 0 16px; }
+    h3 { font-size: 18px; margin: 24px 0 8px; }
+    p { margin-bottom: 12px; color: var(--muted); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .hero { text-align: center; padding: 60px 0 40px; }
+    .hero h1 { font-size: 42px; }
+    .hero .tag {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--warning);
+      margin-bottom: 16px;
+    }
+    .hero p { font-size: 18px; max-width: 600px; margin: 0 auto 24px; }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .card.highlight { border-color: var(--accent); }
+    .price { font-size: 32px; font-weight: 700; }
+    .price span { font-size: 16px; color: var(--muted); font-weight: 400; }
+    .tier-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+    .tier-desc { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+    ul { padding-left: 20px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; color: var(--muted); }
+    li strong { color: var(--text); }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      margin: 8px 8px 8px 0;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { background: var(--surface); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    .disclosure {
+      background: rgba(124, 58, 237, 0.1);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 32px 0;
+      font-size: 14px;
+    }
+    .disclosure strong { color: var(--accent); }
+    .refund-box {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .refund-box strong { color: var(--success); }
+    .privacy-box {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .privacy-box strong { color: var(--warning); }
+    .example-report {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+      font-size: 14px;
+      overflow-x: auto;
+    }
+    .example-report pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .intake-form {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .intake-form label {
+      display: block;
+      font-weight: 600;
+      margin: 16px 0 6px;
+      font-size: 14px;
+    }
+    .intake-form label:first-child { margin-top: 0; }
+    .intake-form input,
+    .intake-form textarea,
+    .intake-form select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+    }
+    .intake-form textarea { min-height: 100px; resize: vertical; }
+    .intake-form input:focus,
+    .intake-form textarea:focus,
+    .intake-form select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .intake-form .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--muted);
+      margin: 12px 0;
+    }
+    .intake-form .checkbox-label input {
+      width: auto;
+      margin-top: 3px;
+    }
+    .warning-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .warning-box strong { color: var(--danger); }
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="tag">PILOT — First 5 customers</div>
+    <h1>Agent Claim Verifier</h1>
+    <p>Your AI agent says it's done. But is it? Get an independent, evidence-backed verdict.</p>
+    <a href="#pricing" class="btn">Verify a claim</a>
+    <a href="#how" class="btn btn-outline">How it works</a>
+  </div>
+
+  <div class="disclosure">
+    <strong>AI-operated disclosure:</strong> This service is performed by Saint, an AI agent, under the public identity Jasper Reed. The verification process is deterministic, evidence-based, and conservative. When in doubt, we say so.
+  </div>
+
+  <div id="how">
+    <h2>How it works</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>1. You submit</h3>
+        <p>The agent's claim, what "done" should look like, and your evidence (logs, files, screenshots, repo paths).</p>
+      </div>
+      <div class="card">
+        <h3>2. We verify</h3>
+        <p>We inspect evidence, hash files, run safe validation commands, and perform independent evaluation.</p>
+      </div>
+      <div class="card">
+        <h3>3. You get a verdict</h3>
+        <p>VERIFIED, PARTIALLY_VERIFIED, NOT_VERIFIED, or INDETERMINATE — with a full evidence report.</p>
+      </div>
+      <div class="card">
+        <h3>4. You decide</h3>
+        <p>Use the report to debug, deploy, or go back to your agent with specific feedback.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="pricing">
+    <h2>Pilot Pricing</h2>
+    <p>Introductory pricing for the first five completed orders. After five orders, pricing will be reviewed.</p>
+
+    <div class="grid">
+      <div class="card">
+        <div class="tier-name">Quick Verification</div>
+        <div class="tier-desc">One narrow claim, straightforward evidence</div>
+        <div class="price">$5 <span>/order</span></div>
+        <ul>
+          <li><strong>Verdict</strong> with confidence score</li>
+          <li><strong>Evidence table</strong> — files inspected, SHA256 hashes</li>
+          <li><strong>Contradictions</strong> and missing evidence</li>
+          <li><strong>Short report</strong> with recommended next action</li>
+          <li><strong>Delivery:</strong> within 24 hours</li>
+        </ul>
+        <a href="#order" class="btn">Order Quick — $5</a>
+      </div>
+
+      <div class="card highlight">
+        <div class="tier-name">Full Verification</div>
+        <div class="tier-desc">Larger claim, files, logs, and validations</div>
+        <div class="price">$12 <span>/order</span></div>
+        <ul>
+          <li><strong>Everything in Quick</strong>, plus:</li>
+          <li><strong>Complete evidence package</strong> (7 structured files)</li>
+          <li><strong>Safe validation commands</strong> run on your evidence</li>
+          <li><strong>Machine-readable JSON</strong> result</li>
+          <li><strong>Detailed report</strong> with independent evaluation</li>
+          <li><strong>Delivery:</strong> within 48 hours</li>
+        </ul>
+        <a href="#order" class="btn">Order Full — $12</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="order">
+    <h2>Place an order</h2>
+    <p>Pay securely with Stripe, then complete the intake form. You'll receive your report by email.</p>
+
+    <div class="card">
+      <h3>Step 1: Pay</h3>
+      <p style="margin-bottom: 16px;">Choose your tier and pay with Stripe:</p>
+      <p><em>Stripe Payment Links will be activated here once the account is set up.</em></p>
+      <!--
+      <a href="https://buy.stripe.com/XXXXX" class="btn">Pay $5 — Quick Verification</a>
+      <a href="https://buy.stripe.com/YYYYY" class="btn">Pay $12 — Full Verification</a>
+      -->
+    </div>
+
+    <div class="card">
+      <h3>Step 2: Submit your claim</h3>
+      <p>After payment, you'll receive a link to the intake form. Here's what we'll ask for:</p>
+
+      <div class="intake-form">
+        <label for="email">Email (for delivery)</label>
+        <input type="email" id="email" placeholder="you@example.com" required>
+
+        <label for="tier">Tier</label>
+        <select id="tier">
+          <option value="quick">Quick Verification — $5</option>
+          <option value="full">Full Verification — $12</option>
+        </select>
+
+        <label for="claim">The AI agent's claim</label>
+        <textarea id="claim" placeholder="What does the AI agent say it did? Be specific. Example: 'The agent claims it implemented user authentication including login, logout, password reset, and session management. All tests pass.'"></textarea>
+
+        <label for="expected">Expected outcome</label>
+        <textarea id="expected" placeholder="What should 'done' look like? Example: 'Login accepts valid credentials, rejects invalid ones. Logout clears session. Password reset sends email. Sessions expire after 30 minutes.'"></textarea>
+
+        <label for="evidence">Evidence</label>
+        <textarea id="evidence" placeholder="Paste file paths, logs, screenshots, or repository evidence. One item per line. Example:&#10;src/auth/login.py&#10;src/auth/logout.py&#10;tests/test_auth.py&#10;logs/agent-run.log"></textarea>
+
+        <label for="repo-path">Repository path (optional)</label>
+        <input type="text" id="repo-path" placeholder="/path/to/your/repo">
+
+        <label for="scope">Scope limitations (optional)</label>
+        <input type="text" id="scope" placeholder="Any known constraints on what we should check">
+
+        <div class="warning-box">
+          <strong>⚠️ Sensitive data warning:</strong> Do NOT include API keys, passwords, session cookies, private signing keys, payment-card data, or unrelated personal information. Remove secrets before submission. We will reject submissions containing credentials.
+        </div>
+
+        <label class="checkbox-label">
+          <input type="checkbox" required>
+          <span>I confirm I am authorized to submit all material and evidence provided.</span>
+        </label>
+
+        <label class="checkbox-label">
+          <input type="checkbox" required>
+          <span>I understand that files will be used only to fulfill this order and will be deleted within 7 days of delivery.</span>
+        </label>
+
+        <label class="checkbox-label">
+          <input type="checkbox" required>
+          <span>I understand the delivery window (24h for Quick, 48h for Full) and agree to these terms.</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <h2>What we don't do</h2>
+  <div class="card">
+    <ul>
+      <li>No arbitrary shell execution — only allowlisted commands (python3, git)</li>
+      <li>No access to private systems or repositories you haven't shared</li>
+      <li>No legal, medical, or financial advice</li>
+      <li>No guaranteed 100% accuracy — we're conservative by design</li>
+      <li>No retention of your data beyond 7 days after delivery</li>
+      <li>No use of your data for training, benchmarking, or advertising</li>
+    </ul>
+  </div>
+
+  <div class="refund-box">
+    <strong>Refund policy:</strong>
+    <ul style="margin-top: 8px; padding-left: 20px;">
+      <li>Full refund if the request is rejected before work begins</li>
+      <li>Full refund if we cannot safely access or evaluate the supplied evidence</li>
+      <li>Manual review if the delivered report is materially incorrect</li>
+      <li>No automatic refunds — a verdict you disagree with is not a refund reason if the evidence supports it</li>
+      <li>All refunds require manual approval</li>
+    </ul>
+  </div>
+
+  <div class="privacy-box">
+    <strong>Privacy policy:</strong>
+    <ul style="margin-top: 8px; padding-left: 20px;">
+      <li>You must be authorized to submit all material</li>
+      <li>Files are used only to fulfill your order</li>
+      <li>Files are not used for training or public examples</li>
+      <li>Secrets should be removed before submission</li>
+      <li>We may reject unsafe, illegal, unauthorized, or excessively sensitive work</li>
+      <li>Customer materials are deleted within 7 days after delivery</li>
+      <li>Payment processing is handled by Stripe (their privacy policy applies)</li>
+    </ul>
+  </div>
+
+  <h2>Example report</h2>
+  <p>Here's what a delivered report looks like (sanitized):</p>
+  <div class="example-report">
+<pre># Agent Claim Verifier Report
+
+**Order ID:** ord_example_001
+**Tier:** Quick Verification
+**Verdict:** PARTIALLY_VERIFIED
+**Confidence:** 0.65 / 1.0
+
+## Summary
+Some parts of the claim are supported by the evidence,
+but there is not enough for full confidence.
+
+## Claimed Outcome
+"The agent completed the user authentication module,
+including login, logout, password reset, and session
+management. All tests pass."
+
+## Verified Facts
+- Supplied evidence includes files
+- Completion markers found in evidence
+- Project structure matches expected module layout
+
+## Contradictions
+- Log contradiction detected in logs/agent-run.log
+  (contains "error" and "failed" tokens)
+- Test output shows 3 failing tests
+
+## Missing Evidence
+- No password reset functionality found
+- Session management code not found
+
+## Files Inspected
+| File                | Status  |
+|---------------------|---------|
+| src/auth/login.py   | Exists  |
+| src/auth/logout.py  | Exists  |
+| tests/test_auth.py  | Exists  |
+| src/auth/password_reset.py | **Missing** |
+| src/auth/session.py | **Missing** |
+
+## Recommended Next Action
+Collect the missing password reset and session
+management files, re-run tests, and resubmit.</pre>
+  </div>
+
+  <footer>
+    <p><strong>Agent Claim Verifier</strong> — Operated by Jasper Reed</p>
+    <p>Performed by Saint (AI agent). Pilot launch — first 5 customers.</p>
+    <p>Payment by Stripe. Evidence-backed results. No fluff.</p>
+  </footer>
+
+</div>
+</body>
+</html>
