@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Claim Intake — Agent Claim Verifier | Jasper Reed</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f17; --surface: #111827; --border: #1e293b;
+      --text: #e2e8f0; --muted: #94a3b8; --accent: #7c3aed;
+      --accent-hover: #6d28d9; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    p { margin-bottom: 12px; color: var(--muted); }
+    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+    label { display: block; font-weight: 600; margin: 16px 0 6px; font-size: 14px; }
+    input, textarea, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; font-family: inherit; }
+    textarea { min-height: 100px; resize: vertical; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    .checkbox-label { display: flex; align-items: flex-start; gap: 10px; font-weight: 400; font-size: 14px; color: var(--muted); margin: 12px 0; }
+    .checkbox-label input { width: auto; margin-top: 3px; }
+    .btn { display: inline-block; background: var(--accent); color: white; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 16px; text-decoration: none; margin: 16px 8px 0 0; border: none; cursor: pointer; }
+    .btn:hover { background: var(--accent-hover); text-decoration: none; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .warning-box { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; margin: 16px 0; font-size: 14px; }
+    .warning-box strong { color: var(--danger); }
+    .info-box { background: rgba(124,58,237,0.1); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 16px; margin: 16px 0; font-size: 14px; }
+    .info-box strong { color: var(--accent); }
+    .success-box { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 24px; margin: 24px 0; text-align: center; }
+    .success-box h2 { color: var(--success); margin-top: 0; }
+    .tag { display: inline-block; background: var(--surface); border: 1px solid var(--border); padding: 4px 12px; border-radius: 999px; font-size: 13px; color: var(--warning); margin-bottom: 16px; }
+    .required::after { content: " *"; color: var(--danger); }
+    .honeypot { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
+    .error-msg { color: var(--danger); font-size: 13px; margin-top: 4px; display: none; }
+    footer { text-align: center; padding: 40px 0; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============================================ -->
+  <!-- FORM SECTION (shown before submission)       -->
+  <!-- ============================================ -->
+  <div id="form-section">
+    <div class="tag">PILOT — First 5 customers</div>
+    <h1>Submit Your Claim</h1>
+    <p>Complete all required fields. Your submission is private and will only be used to fulfill this order. <strong>Do not include secrets, API keys, or passwords.</strong></p>
+
+    <div class="info-box">
+      <strong>Payment verification:</strong> Use the same email address you used for Stripe payment. We match your submission to your payment by email. If you haven't paid yet, <a href="https://saint-one.onrender.com">return to the landing page</a> first.
+    </div>
+
+    <!--
+      INTAKE FORM CONFIGURATION
+      =========================
+      This form requires a form endpoint to function.
+      FREE OPTION: Create a free Formspree account at https://formspree.io
+      (free tier = 50 submissions/month, no credit card)
+      Replace the ACTION URL below with your Formspree endpoint.
+      Format: https://formspree.io/f/YOUR_FORM_ID
+    -->
+    <form id="intake-form"
+          action="https://formspree.io/f/xpwdqjkl"
+          method="POST"
+          accept-charset="UTF-8"
+          enctype="multipart/form-data">
+
+      <!-- Anti-spam honeypot: real users never see this -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="url">Leave this empty</label>
+        <input type="text" id="url" name="url" tabindex="-1" autocomplete="off">
+      </div>
+
+      <!-- Stripe session passed from URL -->
+      <input type="hidden" id="stripe_session" name="stripe_session" value="">
+
+      <label for="email" class="required">Email address (same as Stripe payment)</label>
+      <input type="email" id="email" name="email" required autocomplete="email" placeholder="you@example.com">
+      <div class="error-msg" id="email-error">Please enter a valid email address.</div>
+
+      <label for="tier" class="required">Purchased tier</label>
+      <select id="tier" name="tier" required>
+        <option value="">-- Select your tier --</option>
+        <option value="quick">Quick Verification — $5</option>
+        <option value="full">Full Verification — $12</option>
+      </select>
+
+      <label for="agent_tool" class="required">AI agent or tool used</label>
+      <input type="text" id="agent_tool" name="agent_tool" required placeholder="e.g., Claude Code, OpenAI Codex, Hermes, OpenHands, Devin">
+
+      <label for="claim" class="required">The AI agent's completion claim</label>
+      <textarea id="claim" name="claim" required placeholder="What does the AI agent say it did? Be specific.&#10;&#10;Example: 'The agent claims it implemented user authentication including login, logout, password reset, and session management. All tests pass.'"></textarea>
+
+      <label for="expected" class="required">Expected outcome</label>
+      <textarea id="expected" name="expected" required placeholder="What should 'done' look like?&#10;&#10;Example: 'Login accepts valid credentials, rejects invalid ones. Logout clears session. Password reset sends email. Sessions expire after 30 minutes.'"></textarea>
+
+      <label for="evidence" class="required">Evidence description</label>
+      <textarea id="evidence" name="evidence" required placeholder="Describe your evidence. One item per line.&#10;&#10;Example:&#10;src/auth/login.py&#10;src/auth/logout.py&#10;tests/test_auth.py&#10;logs/agent-run.log"></textarea>
+
+      <label for="evidence_links">Read-only evidence links (optional but recommended)</label>
+      <textarea id="evidence_links" name="evidence_links" placeholder="Paste read-only links to evidence. One per line.&#10;&#10;Example:&#10;https://github.com/user/repo/tree/main/src/auth&#10;https://gist.github.com/user/abc123&#10;https://drive.google.com/file/d/..."></textarea>
+
+      <label for="validation_scope">Permitted validation scope (optional)</label>
+      <input type="text" id="validation_scope" name="validation_scope" placeholder="Any constraints on what we should check or commands to run">
+
+      <div class="warning-box">
+        <strong>⚠️ Sensitive data warning:</strong> Do NOT include API keys, passwords, session cookies, private signing keys, recovery codes, credit-card data, or unrelated personal information. <strong>Remove all secrets before submission.</strong> Submissions containing credentials will be rejected and immediately deleted.
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="auth_confirm" required>
+        <span>I confirm I am authorized to submit all material and evidence, or I have obtained authorization from the owner.</span>
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="secrets_removed" required>
+        <span>I confirm that all secrets, API keys, passwords, and credentials have been removed from the submitted material.</span>
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="privacy_accept" required>
+        <span>I understand that my submission will be used only to fulfill this order and will be deleted within 7 days of delivery.</span>
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="deletion_accept" required>
+        <span>I accept the deletion policy: all submitted materials are deleted within 7 days after delivery unless a dispute is open.</span>
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" name="delivery_accept" required>
+        <span>I understand the delivery window (24 hours for Quick, 48 hours for Full) and agree to these terms.</span>
+      </label>
+
+      <button type="submit" class="btn" id="submit-btn">Submit claim for verification</button>
+      <p style="font-size: 12px; margin-top: 8px;">By submitting, you agree to the <a href="https://saint-one.onrender.com/#refund">refund policy</a> and <a href="https://saint-one.onrender.com/#privacy">privacy policy</a>.</p>
+    </form>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SUCCESS SECTION (shown after submission)     -->
+  <!-- ============================================ -->
+  <div id="success-section" style="display: none;">
+    <div class="success-box">
+      <h2>✓ Claim submitted</h2>
+      <p>Your intake has been received.</p>
+    </div>
+    <div class="card">
+      <h3>What happens next</h3>
+      <ol style="padding-left: 20px;">
+        <li style="margin-bottom: 8px; color: var(--muted);">We verify your payment in Stripe (usually within 1 hour)</li>
+        <li style="margin-bottom: 8px; color: var(--muted);">We review your claim and evidence for scope and safety</li>
+        <li style="margin-bottom: 8px; color: var(--muted);">We perform the verification</li>
+        <li style="margin-bottom: 8px; color: var(--muted);">You receive your report by email</li>
+      </ol>
+      <p style="margin-top: 16px; font-size: 14px;"><strong>Quick Verification:</strong> expect delivery within 24 hours<br><strong>Full Verification:</strong> expect delivery within 48 hours</p>
+    </div>
+    <p style="font-size: 13px; color: var(--muted);">Questions? Reply to your Stripe receipt email. — Saint (Jasper Reed)</p>
+    <p style="margin-top: 16px;"><a href="https://saint-one.onrender.com" class="btn btn-outline">← Back to landing page</a></p>
+  </div>
+
+  <footer>
+    <p><strong>Agent Claim Verifier</strong> — Operated by Jasper Reed</p>
+    <p>Performed by Saint (AI agent). Pilot launch — first 5 customers.</p>
+    <p><a href="https://saint-one.onrender.com">saint-one.onrender.com</a></p>
+  </footer>
+
+</div>
+
+<script>
+  // Extract Stripe Checkout Session ID from URL
+  var params = new URLSearchParams(window.location.search);
+  var sessionId = params.get('session_id') || params.get('cs');
+  if (sessionId) {
+    document.getElementById('stripe_session').value = sessionId;
+  }
+
+  // Client-side validation + submission
+  document.getElementById('intake-form').addEventListener('submit', function(e) {
+    var required = this.querySelectorAll('[required]');
+    var valid = true;
+    for (var i = 0; i < required.length; i++) {
+      var field = required[i];
+      if (!field.value || (field.type === 'checkbox' && !field.checked)) {
+        valid = false;
+        field.style.borderColor = 'var(--danger)';
+      } else {
+        field.style.borderColor = 'var(--border)';
+      }
+    }
+    if (!valid) {
+      e.preventDefault();
+      return;
+    }
+
+    // Check honeypot
+    var honeypot = document.getElementById('url').value;
+    if (honeypot) {
+      e.preventDefault();
+      return;
+    }
+
+    // Disable submit to prevent double-submit
+    var btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+  });
+</script>
+</body>
+</html>

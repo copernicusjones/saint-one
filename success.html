@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Payment Received — Agent Claim Verifier | Jasper Reed</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0b0f17; --surface: #111827; --border: #1e293b;
+      --text: #e2e8f0; --muted: #94a3b8; --accent: #7c3aed;
+      --accent-hover: #6d28d9; --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+    h1 { font-size: 28px; margin-bottom: 8px; }
+    p { margin-bottom: 12px; color: var(--muted); }
+    a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: underline; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+    .btn { display: inline-block; background: var(--accent); color: white; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 16px; text-decoration: none; margin: 8px 8px 8px 0; border: none; cursor: pointer; }
+    .btn:hover { background: var(--accent-hover); text-decoration: none; }
+    .success-box { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 32px; margin: 32px 0; text-align: center; }
+    .success-box h2 { color: var(--success); margin-top: 0; font-size: 24px; }
+    .tag { display: inline-block; background: var(--surface); border: 1px solid var(--border); padding: 4px 12px; border-radius: 999px; font-size: 13px; color: var(--warning); margin-bottom: 16px; }
+    .steps { counter-reset: step; }
+    .steps li { list-style: none; counter-increment: step; padding: 12px 0 12px 48px; position: relative; color: var(--muted); border-bottom: 1px solid var(--border); }
+    .steps li:last-child { border-bottom: none; }
+    .steps li::before { content: counter(step); position: absolute; left: 0; top: 12px; width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    .test-notice { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.4); border-radius: 12px; padding: 16px; margin: 16px 0; font-size: 14px; text-align: center; }
+    .test-notice strong { color: var(--warning); }
+    footer { text-align: center; padding: 40px 0; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="success-box">
+    <h2>✓ Payment received</h2>
+    <p>Thank you for your order. Your payment has been confirmed.</p>
+  </div>
+
+  <div class="test-notice">
+    <strong>⚠️ TEST MODE:</strong> This was a test payment. No real money was charged. When live, your Stripe receipt will serve as your proof of payment.
+  </div>
+
+  <div class="card">
+    <h3>Next step: Submit your claim</h3>
+    <p>To complete your order, click the button below to access the intake form. You'll need to provide:</p>
+    <ul style="padding-left: 20px; margin-bottom: 16px;">
+      <li style="margin-bottom: 6px; color: var(--muted);">The AI agent's completion claim</li>
+      <li style="margin-bottom: 6px; color: var(--muted);">Expected outcome</li>
+      <li style="margin-bottom: 6px; color: var(--muted);">Evidence (file paths, logs, screenshots, repo links)</li>
+      <li style="margin-bottom: 6px; color: var(--muted);">Authorization confirmation</li>
+    </ul>
+    <a href="/intake.html" class="btn" id="intake-link">Continue to intake form →</a>
+  </div>
+
+  <div class="card">
+    <h3>What happens after intake</h3>
+    <ol class="steps">
+      <li>We verify your payment and match it to your intake</li>
+      <li>We review your claim for scope and safety</li>
+      <li>We inspect evidence and run safe validations</li>
+      <li>We deliver your evidence-backed report by email</li>
+    </ol>
+    <p style="margin-top: 16px; font-size: 14px;"><strong>Quick Verification:</strong> delivery within 24 hours<br><strong>Full Verification:</strong> delivery within 48 hours</p>
+  </div>
+
+  <div class="card" style="font-size: 14px;">
+    <h3>Important reminders</h3>
+    <ul style="padding-left: 20px;">
+      <li style="margin-bottom: 6px; color: var(--muted);"><strong>Do not include secrets</strong> — remove API keys, passwords, and credentials from all evidence</li>
+      <li style="margin-bottom: 6px; color: var(--muted);"><strong>Use the same email</strong> as your Stripe payment so we can match your order</li>
+      <li style="margin-bottom: 6px; color: var(--muted);"><strong>Read-only links preferred</strong> — share evidence via GitHub, Gists, or cloud storage links rather than pasting raw content</li>
+      <li style="margin-bottom: 6px; color: var(--muted);">Your data will be deleted within 7 days of delivery</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p><strong>Agent Claim Verifier</strong> — Operated by Jasper Reed</p>
+    <p>Performed by Saint (AI agent). Pilot launch — first 5 customers.</p>
+    <p><a href="https://saint-one.onrender.com">← Back to landing page</a></p>
+  </footer>
+
+</div>
+
+<script>
+  // Pass Stripe session ID to intake form if present
+  var params = new URLSearchParams(window.location.search);
+  var sessionId = params.get('session_id') || params.get('cs');
+  var intakeLink = document.getElementById('intake-link');
+  if (sessionId && intakeLink) {
+    intakeLink.href = '/intake.html?session_id=' + encodeURIComponent(sessionId);
+  }
+</script>
+</body>
+</html>

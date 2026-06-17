@@ -125,52 +125,6 @@
       font-size: 13px;
       color: var(--muted);
     }
-    .intake-form {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin: 24px 0;
-    }
-    .intake-form label {
-      display: block;
-      font-weight: 600;
-      margin: 16px 0 6px;
-      font-size: 14px;
-    }
-    .intake-form label:first-child { margin-top: 0; }
-    .intake-form input,
-    .intake-form textarea,
-    .intake-form select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      font-family: inherit;
-    }
-    .intake-form textarea { min-height: 100px; resize: vertical; }
-    .intake-form input:focus,
-    .intake-form textarea:focus,
-    .intake-form select:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-    .intake-form .checkbox-label {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-weight: 400;
-      font-size: 14px;
-      color: var(--muted);
-      margin: 12px 0;
-    }
-    .intake-form .checkbox-label input {
-      width: auto;
-      margin-top: 3px;
-    }
     .warning-box {
       background: rgba(239, 68, 68, 0.1);
       border: 1px solid rgba(239, 68, 68, 0.3);
@@ -271,11 +225,11 @@
 
   <div id="order">
     <h2>Place an order</h2>
-    <p>Pay securely with Stripe, then complete the intake form. You'll receive your report by email.</p>
+    <p>Two steps: pay, then submit your claim.</p>
 
     <div class="card">
-      <h3>Step 1: Pay</h3>
-      <p style="margin-bottom: 16px;">Choose your tier and pay with Stripe:</p>
+      <h3>Step 1: Pay with Stripe</h3>
+      <p style="margin-bottom: 16px;">Choose your tier and complete payment. After payment, you'll be redirected to the intake form.</p>
       <a href="https://buy.stripe.com/test_9B6bJ3fmf2S7aav3TEbMQ02" class="btn" target="_blank" rel="noopener">Pay $5 — Quick Verification (Test)</a>
       <a href="https://buy.stripe.com/test_cNi00la1VakzgyTeyibMQ03" class="btn" target="_blank" rel="noopener">Pay $12 — Full Verification (Test)</a>
       <p style="margin-top: 12px; font-size: 13px; color: var(--muted);">Test mode — use card <code>4242 4242 4242 4242</code>, any future date, any CVC.</p>
@@ -283,52 +237,16 @@
 
     <div class="card">
       <h3>Step 2: Submit your claim</h3>
-      <p>After payment, you'll receive a link to the intake form. Here's what we'll ask for:</p>
-
-      <div class="intake-form">
-        <label for="email">Email (for delivery)</label>
-        <input type="email" id="email" placeholder="you@example.com" required>
-
-        <label for="tier">Tier</label>
-        <select id="tier">
-          <option value="quick">Quick Verification — $5</option>
-          <option value="full">Full Verification — $12</option>
-        </select>
-
-        <label for="claim">The AI agent's claim</label>
-        <textarea id="claim" placeholder="What does the AI agent say it did? Be specific. Example: 'The agent claims it implemented user authentication including login, logout, password reset, and session management. All tests pass.'"></textarea>
-
-        <label for="expected">Expected outcome</label>
-        <textarea id="expected" placeholder="What should 'done' look like? Example: 'Login accepts valid credentials, rejects invalid ones. Logout clears session. Password reset sends email. Sessions expire after 30 minutes.'"></textarea>
-
-        <label for="evidence">Evidence</label>
-        <textarea id="evidence" placeholder="Paste file paths, logs, screenshots, or repository evidence. One item per line. Example:&#10;src/auth/login.py&#10;src/auth/logout.py&#10;tests/test_auth.py&#10;logs/agent-run.log"></textarea>
-
-        <label for="repo-path">Repository path (optional)</label>
-        <input type="text" id="repo-path" placeholder="/path/to/your/repo">
-
-        <label for="scope">Scope limitations (optional)</label>
-        <input type="text" id="scope" placeholder="Any known constraints on what we should check">
-
-        <div class="warning-box">
-          <strong>⚠️ Sensitive data warning:</strong> Do NOT include API keys, passwords, session cookies, private signing keys, payment-card data, or unrelated personal information. Remove secrets before submission. We will reject submissions containing credentials.
-        </div>
-
-        <label class="checkbox-label">
-          <input type="checkbox" required>
-          <span>I confirm I am authorized to submit all material and evidence provided.</span>
-        </label>
-
-        <label class="checkbox-label">
-          <input type="checkbox" required>
-          <span>I understand that files will be used only to fulfill this order and will be deleted within 7 days of delivery.</span>
-        </label>
-
-        <label class="checkbox-label">
-          <input type="checkbox" required>
-          <span>I understand the delivery window (24h for Quick, 48h for Full) and agree to these terms.</span>
-        </label>
-      </div>
+      <p>After payment, you'll be redirected to the intake form. You'll provide:</p>
+      <ul style="padding-left: 20px; margin: 12px 0;">
+        <li style="margin-bottom: 4px; color: var(--muted);">Email (same as payment)</li>
+        <li style="margin-bottom: 4px; color: var(--muted);">Selected tier</li>
+        <li style="margin-bottom: 4px; color: var(--muted);">AI agent or tool used</li>
+        <li style="margin-bottom: 4px; color: var(--muted);">The agent's completion claim</li>
+        <li style="margin-bottom: 4px; color: var(--muted);">Expected outcome</li>
+        <li style="margin-bottom: 4px; color: var(--muted);">Evidence (file paths, logs, screenshots, repo links)</li>
+        <li style="margin-bottom: 4px; color: var(--muted);">Authorization and privacy confirmations</li>
+      </ul>
     </div>
   </div>
 
