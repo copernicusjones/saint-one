@@ -55,26 +55,21 @@
       <strong>Payment verification:</strong> Use the same email address you used for Stripe payment. We match your submission to your payment by email. If you haven't paid yet, <a href="https://saint-one.onrender.com">return to the landing page</a> first.
     </div>
 
-    <!--
-      INTAKE FORM CONFIGURATION
-      =========================
-      This form requires a form endpoint to function.
-      FREE OPTION: Create a free Formspree account at https://formspree.io
-      (free tier = 50 submissions/month, no credit card)
-      Replace the ACTION URL below with your Formspree endpoint.
-      Format: https://formspree.io/f/YOUR_FORM_ID
-    -->
     <form id="intake-form"
-          action="https://formspree.io/f/xpwdqjkl"
           method="POST"
-          accept-charset="UTF-8"
-          enctype="multipart/form-data">
+          accept-charset="UTF-8">
 
       <!-- Anti-spam honeypot: real users never see this -->
       <div class="honeypot" aria-hidden="true">
         <label for="url">Leave this empty</label>
         <input type="text" id="url" name="url" tabindex="-1" autocomplete="off">
       </div>
+
+      <!-- FormSubmit configuration -->
+      <input type="hidden" name="_subject" value="Saint One — New Claim Intake">
+      <input type="hidden" name="_next" value="https://saint-one.onrender.com/intake.html?submitted=1">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
 
       <!-- Stripe session passed from URL -->
       <input type="hidden" id="stripe_session" name="stripe_session" value="">
@@ -179,6 +174,16 @@
   if (sessionId) {
     document.getElementById('stripe_session').value = sessionId;
   }
+
+  // Show success section if redirected after submission
+  if (params.get('submitted') === '1') {
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('success-section').style.display = 'block';
+  }
+
+  // Set FormSubmit action with runtime email assembly (anti-scrape)
+  var _e = ['jonathenadkins','@','gmail','.','com'].join('');
+  document.getElementById('intake-form').action = 'https://formsubmit.co/' + _e;
 
   // Client-side validation + submission
   document.getElementById('intake-form').addEventListener('submit', function(e) {
