@@ -182,8 +182,8 @@
   }
 
   // Set FormSubmit action with runtime email assembly (anti-scrape)
-  var _e = ['jonathenadkins','@','gmail','.','com'].join('');
-  document.getElementById('intake-form').action = 'https://formsubmit.co/' + _e;
+  var _p = atob('am9uYXRoZW5hZGluc0BnbWFpbC5jb20=');
+  document.getElementById('intake-form').action = 'https://formsubmit.co/' + _p;
 
   // Client-side validation + submission
   document.getElementById('intake-form').addEventListener('submit', function(e) {
